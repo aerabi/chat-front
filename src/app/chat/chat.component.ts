@@ -1,24 +1,30 @@
 import { Component } from '@angular/core';
 import { ChatService } from "./chat.service";
-import { Message } from "./chat.types";
+import { Message, Session } from "./chat.types";
 import { CommonModule } from "@angular/common";
+import { MatCardModule } from "@angular/material/card";
+import { MatButton } from "@angular/material/button";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCardModule, MatButton],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.sass'
 })
 export class ChatComponent {
   messages: Message[] = [];
+  session: Session | undefined;
   sessionId: number | string | undefined;
-  dummyMessages: Message[] = [{ id: 1, text: 'Hello', userId: 1 }, { id: 2, text: 'Hi', userId: 2 }];
+  userNames: { [key: string | number]: string } = {};
 
   constructor(private readonly service: ChatService) {
     this.createChatSessionIfNotExists().then(session => {
+      this.session = session;
       this.sessionId = session.id;
-      return this.service.getChatMessages(session.id);
+      return this.getUserNames();
+    }).then(() => {
+      return this.service.getChatMessages(this.sessionId!);
     }).then(messages => {
       this.messages = messages;
     });
@@ -40,9 +46,24 @@ export class ChatComponent {
     return sessions[0];
   }
 
+  async getUserNames() {
+    const userIds = this.session?.userIds || [];
+    for (const userId of userIds) {
+      if (!this.userNames[userId]) {
+        const user = await this.service.getUser(userId);
+        this.userNames[userId] = user.name;
+      }
+    }
+  }
+
   async updateChatMessages() {
     if (this.sessionId) {
-      this.messages = await this.service.getChatMessages(this.sessionId);
+      this.messages = (await this.service.getChatMessages(this.sessionId)).map(message => {
+        return {
+          ...message,
+          userName: this.userNames[message.userId]
+        };
+      })
     }
   }
 

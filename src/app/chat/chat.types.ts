@@ -7,6 +7,7 @@ export interface Message {
   id: string | number;
   text: string;
   userId: string | number;
+  userName?: string;
 }
 
 export interface Chat {
