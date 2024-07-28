@@ -14,3 +14,9 @@ export interface Chat {
   users: User[];
   messages: Message[];
 }
+
+export interface Session {
+  id: string | number;
+  userIds: string[] | number[];
+  messages: Message[];
+}

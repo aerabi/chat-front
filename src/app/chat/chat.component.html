@@ -1,2 +1,5 @@
-<p>chat works!</p>
-<button (click)="registerUser('user1')">Register User 1</button>
+<div *ngFor="let message of messages; trackBy: trackMessage">
+  <p>{{message.text}}</p>
+</div>
+
+<p>Hello!</p>
