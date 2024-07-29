@@ -9,4 +9,11 @@
   </mat-card-actions>
 </mat-card>
 
-<p>Hello!</p>
+<mat-card class="chat-box-bottom" appearance="outlined">
+  <mat-card-content>
+    <mat-form-field>
+      <input matInput placeholder="Message" [(ngModel)]="messageText">
+    </mat-form-field>
+    <button mat-stroked-button color="primary" (click)="sendMessage()">Send</button>
+  </mat-card-content>
+</mat-card>

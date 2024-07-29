@@ -4,11 +4,14 @@ import { Message, Session } from "./chat.types";
 import { CommonModule } from "@angular/common";
 import { MatCardModule } from "@angular/material/card";
 import { MatButton } from "@angular/material/button";
+import { MatFormField } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
+import { FormsModule } from "@angular/forms";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButton],
+  imports: [CommonModule, MatCardModule, MatButton, MatFormField, MatInput, FormsModule],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.sass'
 })
@@ -17,6 +20,7 @@ export class ChatComponent {
   session: Session | undefined;
   sessionId: number | string | undefined;
   userNames: { [key: string | number]: string } = {};
+  messageText: string = '';
 
   constructor(private readonly service: ChatService) {
     this.createChatSessionIfNotExists().then(session => {
@@ -69,5 +73,17 @@ export class ChatComponent {
 
   trackMessage(index: number, message: Message) {
     return message.id;
+  }
+
+  async sendMessage() {
+    if (this.messageText && this.sessionId) {
+      const message = {
+        text: this.messageText,
+        userId: this.session?.userIds[0] || 0
+      };
+      await this.service.addMessage(this.sessionId, message);
+      this.messageText = '';
+      return this.updateChatMessages();
+    }
   }
 }

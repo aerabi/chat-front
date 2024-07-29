@@ -45,4 +45,8 @@ export class ChatService {
     const response = await axios.get<Message[]>(`/sessions/${chatId}/messages`);
     return response.data;
   }
+
+  async addMessage(chatId: number | string, message: Omit<Message, 'id'>): Promise<void> {
+    await axios.post(`/sessions/${chatId}/messages`, message);
+  }
 }
